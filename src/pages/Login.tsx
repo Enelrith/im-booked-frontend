@@ -2,7 +2,7 @@ import LoginForm from '../components/LoginForm';
 
 export default function Login() {
   return (
-    <section className="login-section">
+    <section className="login-section flex justify-center">
       <LoginForm />
     </section>
   );

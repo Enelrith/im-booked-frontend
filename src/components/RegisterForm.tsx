@@ -25,7 +25,7 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
-      <div className="element-theme flex flex-col w-100 h-auto text-center p-2 mt-30 gap-y-1 rounded-sm shadow-sm shadow-gray-500">
+      <div className="element-theme flex flex-col w-100 h-fit text-center p-2 mt-30 gap-y-1 rounded-sm shadow-sm shadow-gray-500">
         <h2 className="text-xl border-b border-gray-200 w-35 m-auto pb-0.5 text-shadow-sm text-shadow-gray-900">
           Get Booked
         </h2>
