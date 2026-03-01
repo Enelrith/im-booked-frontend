@@ -28,4 +28,13 @@ export interface Business {
   city: string | File | null;
   country: string | File | null;
   isActive: boolean;
+  services: Service[] | null;
+}
+
+export interface Service {
+  id: string;
+  name: string;
+  price: number;
+  durationMinutes: number;
+  isActive: boolean;
 }

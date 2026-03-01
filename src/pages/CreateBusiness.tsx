@@ -23,6 +23,7 @@ export default function CreateBusiness() {
       city: formData.get('city'),
       country: formData.get('country'),
       isActive: formData.get('isActive') === 'Active',
+      services: null,
     };
 
     const response = await createBusinessRequest(business);
