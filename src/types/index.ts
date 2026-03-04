@@ -38,3 +38,23 @@ export interface Service {
   durationMinutes: number;
   isActive: boolean;
 }
+
+export interface AppointmentPost {
+  clientName: string;
+  appointmentStart: string;
+  appointmentEnd: string;
+  serviceId: string | null;
+}
+
+export interface AppointmentGet {
+  id: string;
+  clientName: string;
+  status: string;
+  appointmentStart: string;
+  appointmentEnd: string;
+  createdAt: string;
+  updatedAt: string;
+  serviceName: string;
+  servicePrice: number;
+  serviceDurationMinutes: number;
+}

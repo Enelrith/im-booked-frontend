@@ -1,69 +1,71 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Business, ErrorResponse, Service } from '../types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faCheck,
-  faPencil,
-  faPlus,
-  faTrashCan,
-  faXmark,
-} from '@fortawesome/free-solid-svg-icons';
+  AppointmentGet,
+  AppointmentPost,
+  Business,
+  ErrorResponse,
+  Service,
+} from '../types';
 import {
   addService,
   deleteService,
   updateService,
 } from '../services/BusinessServices';
 import { getBusiness } from '../services/BusinessView';
+import {
+  addAppointment,
+  getAppointments,
+} from '../services/BusinessAppointments';
+import DisplayAppointments from '../components/DisplayAppointments';
+import ServiceRow from '../components/ServiceRow';
+import ServiceFooterRow from '../components/ServiceFooterRow';
+import AppointmentFooterRow from '../components/AppointmentFooterRow';
 
 export default function ViewBusiness() {
   const [business, setBusiness] = useState<Business>();
   const [services, setServices] = useState<Service[]>([]);
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
-  const [isCreating, setIsCreating] = useState<boolean>(false);
-  const [updatingServiceId, setUpdatingServiceId] = useState<string>();
-  const [updatedName, setUpdatedName] = useState<string>('');
-  const [updatedPrice, setUpdatedPrice] = useState<number>(0);
-  const [updatedDuration, setUpdatedDuration] = useState<number>(0);
-  const [updatedStatus, setUpdatedStatus] = useState<boolean>(false);
-  const [newService, setNewService] = useState<Service>({
-    id: '',
-    name: '',
-    price: 0,
-    durationMinutes: 0,
-    isActive: false,
-  });
+  const [appointments, setAppointments] = useState<AppointmentGet[]>([]);
   const [error, setError] = useState<ErrorResponse | null>(null);
-
   const params = useParams();
   const id = params.id ? params.id : '';
 
   useEffect(() => {
-    const getBusinessResponse = async (id: string) => {
-      const response = await getBusiness(id);
+    const fetchData = async (id: string) => {
+      const [businessResponse, appointmentsResponse] = await Promise.all([
+        getBusiness(id),
+        getAppointments(id, 0),
+      ]);
 
-      if (response.status === 200) {
-        setBusiness(response.data);
-        setServices(response.data.services);
+      if (businessResponse.status === 200) {
+        setBusiness(businessResponse.data);
+        setServices(businessResponse.data.services);
       } else {
-        setError(response);
+        setError(businessResponse);
+      }
+
+      if (appointmentsResponse.status === 200) {
+        setAppointments(appointmentsResponse.data.content);
+      } else {
+        setError(appointmentsResponse);
       }
     };
 
-    getBusinessResponse(id);
+    fetchData(id);
   }, [id]);
 
-  const handleUpdate = async (service: Service) => {
-    service.name = updatedName;
-    service.price = updatedPrice;
-    service.durationMinutes = updatedDuration;
-    service.isActive = updatedStatus;
-
-    const response = await updateService(service);
+  const handleUpdate = async (updatedService: Service) => {
+    const response = await updateService(updatedService);
 
     if (response.status !== 200) {
       setError(response);
       alert(response.data.message);
+    } else {
+      setServices(
+        services.map((service) =>
+          service.id === updatedService.id ? updatedService : service
+        )
+      );
     }
   };
 
@@ -91,280 +93,131 @@ export default function ViewBusiness() {
     }
   };
 
+  const handleAddAppointment = async (
+    business: Business,
+    appointment: AppointmentPost
+  ) => {
+    const response = await addAppointment(business, appointment);
+
+    if (response.status === 201) {
+      setAppointments([...appointments, response.data]);
+    } else {
+      setError(response.data.message);
+      alert(response.data.message);
+    }
+  };
+
   if (!business) return;
   return (
-    <section className="bg-gray-700 ml-auto mr-auto mt-10 flex flex-col w-200 rounded-sm p-2 h-fit">
+    <section className="ml-auto mr-auto mt-10 flex flex-col w-250 gap-y-6 pb-10">
       {error && (
-        <p className="text-red-500">{`${error.message} (${error.status})`}</p>
+        <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3">
+          <p className="text-red-400 text-sm">{`${error.message} (${error.status})`}</p>
+        </div>
       )}
-      <h2 className="ml-auto mr-auto text-2xl font-semibold ">
-        {`${business.name}`}
-      </h2>
-      <p className="mt-5">{`${business.description}`}</p>
-      <div>
-        <h3 className="mt-5 text-xl font-semibold pb-2">Services</h3>
-        <table className="w-full border border-gray-600">
-          <thead className="text-center border border-gray-600">
-            <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Price</th>
-              <th scope="col">Duration (mins)</th>
-              <th scope="col">Status</th>
+
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h2 className="text-2xl font-semibold text-gray-100">
+          {business.name as string}
+        </h2>
+        {business.description && (
+          <p className="mt-2 text-gray-400">{business.description as string}</p>
+        )}
+        <div className="flex mt-4 pt-4 border-t border-gray-700 text-sm text-gray-400 gap-x-4">
+          {business.phone && <span>{business.phone}</span>}
+          {(business.address || business.city || business.country) && (
+            <span className="ml-auto flex gap-x-1">
+              {business.address && `${business.address},`}
+              {business.city && `${business.city},`}
+              {business.country && `${business.country}`}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-100">Services</h3>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-gray-800 text-gray-400 uppercase text-xs tracking-wider border-b border-gray-700">
+              <th scope="col" className="px-4 py-3 text-left font-medium">
+                Name
+              </th>
+              <th scope="col" className="px-4 py-3 text-left font-medium">
+                Price
+              </th>
+              <th scope="col" className="px-4 py-3 text-left font-medium">
+                Duration
+              </th>
+              <th scope="col" className="px-4 py-3 text-left font-medium">
+                Status
+              </th>
+              <th scope="col" className="px-4 py-3 text-left font-medium"></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-700/50">
             {services.map((service) => (
-              <tr
+              <ServiceRow
                 key={service.id}
-                className="border-b border-gray-600 text-center"
-              >
-                <th scope="row" className="font-normal pl-2 w-60">
-                  {isUpdating && updatingServiceId === service.id ? (
-                    <input
-                      type="text"
-                      className="bg-gray-200 text-gray-900 pl-0.5"
-                      value={updatedName}
-                      onChange={(e) => {
-                        setUpdatedName(e.target.value);
-                      }}
-                    ></input>
-                  ) : (
-                    <p>{service.name}</p>
-                  )}
-                </th>
-                <td className="pl-2">
-                  {isUpdating && updatingServiceId === service.id ? (
-                    <input
-                      type="text"
-                      className="bg-gray-200 w-full text-gray-900 pl-0.5"
-                      value={updatedPrice}
-                      onChange={(e) => setUpdatedPrice(Number(e.target.value))}
-                    ></input>
-                  ) : (
-                    <p>{service.price}</p>
-                  )}
-                </td>
-                <td className="pl-2">
-                  {isUpdating && updatingServiceId === service.id ? (
-                    <input
-                      type="text"
-                      className="bg-gray-200 w-full text-gray-900 pl-0.5"
-                      value={updatedDuration}
-                      onChange={(e) =>
-                        setUpdatedDuration(Number(e.target.value))
-                      }
-                    ></input>
-                  ) : (
-                    <p>{service.durationMinutes}</p>
-                  )}
-                </td>
-                <td className="pl-2">
-                  {isUpdating && updatingServiceId === service.id ? (
-                    <select
-                      name="is-active"
-                      className="bg-gray-100 h-6 pl-2 text-gray-900 hover:cursor-pointer"
-                      value={updatedStatus ? 'Active' : 'Inactive'}
-                      onChange={(e) => {
-                        setUpdatedStatus(e.target.value === 'Active');
-                      }}
-                    >
-                      <option className="text-gray-900">Active</option>
-                      <option className="text-gray-900">Inactive</option>
-                    </select>
-                  ) : (
-                    <p>{service.isActive ? 'Active' : 'Inactive'}</p>
-                  )}
-                </td>
-                <td className="w-30">
-                  {!isUpdating && (
-                    <>
-                      <button
-                        className="hover:bg-gray-200 hover:text-gray-900 transition rounded-lg"
-                        onClick={() => {
-                          setIsUpdating(true);
-                          setUpdatingServiceId(service.id);
-                          setUpdatedName(service.name);
-                          setUpdatedPrice(service.price);
-                          setUpdatedDuration(service.durationMinutes);
-                          setUpdatedStatus(service.isActive);
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faPencil}
-                          aria-label="Edit Service"
-                          size="sm"
-                        />
-                      </button>
-                      <button
-                        className="hover:bg-gray-200 transition rounded-lg"
-                        onClick={() => handleDelete(service)}
-                      >
-                        <FontAwesomeIcon
-                          icon={faTrashCan}
-                          className="text-red-500"
-                          aria-label="Delete Service"
-                          size="sm"
-                        />
-                      </button>
-                    </>
-                  )}
-                  {isUpdating && updatingServiceId === service.id && (
-                    <>
-                      <button
-                        className="hover:bg-gray-200 hover:text-gray-900 transition rounded-lg"
-                        onClick={() => {
-                          handleUpdate(service);
-                          setIsUpdating(false);
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-green-500"
-                          aria-label="Apply Changes"
-                          size="sm"
-                        />
-                      </button>
-                      <button
-                        className="hover:bg-gray-200 transition rounded-lg"
-                        onClick={() => {
-                          setIsUpdating(false);
-                          console.log(
-                            `${isUpdating}, ${updatingServiceId}, ${service.id}`
-                          );
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faXmark}
-                          className="text-red-500"
-                          aria-label="Cancel Changes"
-                          size="sm"
-                        />
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
+                service={service}
+                onSave={(service) => {
+                  handleUpdate(service);
+                }}
+                onDelete={handleDelete}
+              />
             ))}
           </tbody>
-          <tfoot>
-            <tr className="text-center h-14">
-              {!isCreating && (
-                <th scope="row" colSpan={5}>
-                  <button
-                    className="w-full hover:bg-gray-200 hover:text-gray-900 transition"
-                    onClick={() => setIsCreating(true)}
-                  >
-                    <FontAwesomeIcon icon={faPlus} />
-                  </button>
-                </th>
-              )}
-              {isCreating && (
-                <>
-                  <th>
-                    <input
-                      type="text"
-                      className="bg-gray-200 w-40 text-gray-900 pl-0.5"
-                      placeholder="Service Name"
-                      value={newService.name}
-                      onChange={(e) => {
-                        setNewService((prev) => ({
-                          ...prev,
-                          name: e.target.value,
-                        }));
-                      }}
-                    />
-                  </th>
-                  <td>
-                    <input
-                      type="text"
-                      className="bg-gray-200 w-20 text-gray-900 pl-0.5"
-                      placeholder="Price"
-                      value={newService.price}
-                      onChange={(e) => {
-                        setNewService((prev) => ({
-                          ...prev,
-                          price: Number(e.target.value),
-                        }));
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="bg-gray-200 w-20 text-gray-900 pl-0.5"
-                      placeholder="Duration"
-                      value={newService.durationMinutes}
-                      onChange={(e) => {
-                        setNewService((prev) => ({
-                          ...prev,
-                          durationMinutes: Number(e.target.value),
-                        }));
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <select
-                      className="bg-gray-200 text-gray-900 h-6 pl-0.5"
-                      onChange={(e) => {
-                        setNewService((prev) => ({
-                          ...prev,
-                          isActive: e.target.value === 'Active',
-                        }));
-                      }}
-                    >
-                      <option>Active</option>
-                      <option>Inactive</option>
-                    </select>
-                  </td>
-                  <td>
-                    <div className="flex">
-                      <button
-                        className="hover:bg-gray-200 hover:text-gray-900 transition rounded-lg"
-                        aria-label="Create Service"
-                        onClick={() => {
-                          if (business) {
-                            handleAddService(business, newService);
-                          }
-                          setIsCreating(false);
-                        }}
-                      >
-                        <FontAwesomeIcon
-                          icon={faCheck}
-                          className="text-green-500"
-                        />
-                      </button>
-                      <button
-                        className="hover:bg-gray-200 hover:text-gray-900 transition rounded-lg"
-                        aria-label="Create Service"
-                        onClick={() => setIsCreating(false)}
-                      >
-                        <FontAwesomeIcon
-                          icon={faXmark}
-                          className="text-red-500"
-                          aria-label="Cancel Service Creation"
-                        />
-                      </button>
-                    </div>
-                  </td>
-                </>
-              )}
-            </tr>
-          </tfoot>
+          <ServiceFooterRow
+            business={business}
+            onAddService={handleAddService}
+          />
         </table>
-        <h3 className="mt-5 text-xl font-semibold pb-2">Appointments</h3>
-        <ul className="flex flex-col gap-y-1">
-          <li>Appointment 1</li>
-          <li>Appointment 2</li>
-        </ul>
       </div>
-      <div className="flex mt-auto pt-10">
-        <div className="mr-auto">
-          <p>{business.phone && `${business.phone}`}</p>
+
+      <div className="bg-gray-800 rounded-lg border border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-100">Appointments</h3>
         </div>
-        <div className="ml-auto flex gap-x-1">
-          <p>{business.address && `${business.address},`}</p>
-          <p>{business.city && `${business.city}`}</p>
-          <p>{business.country && `${business.country}`}</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-225">
+            <thead>
+              <tr className="bg-gray-800 text-gray-400 uppercase text-xs tracking-wider">
+                <th scope="col" className="px-4 py-3 text-left font-medium">
+                  Client
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium">
+                  Start
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium">
+                  End
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium">
+                  Service
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium">
+                  Price
+                </th>
+                <th scope="col" className="px-4 py-3 text-left font-medium">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-700/50">
+              <DisplayAppointments
+                appointments={appointments}
+                services={services}
+                business={business}
+              />
+            </tbody>
+            <AppointmentFooterRow
+              services={services}
+              onAddAppointment={(appointment) =>
+                handleAddAppointment(business, appointment)
+              }
+            />
+          </table>
         </div>
       </div>
     </section>
