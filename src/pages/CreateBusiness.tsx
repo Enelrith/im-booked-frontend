@@ -35,96 +35,139 @@ export default function CreateBusiness() {
   };
 
   return (
-    <section className="bg-gray-700 rounded-md w-130 h-130 m-auto flex flex-col p-2">
-      <form onSubmit={(e) => handleSubmit(e)} className="flex flex-col">
-        <h2 className="text-2xl font-semibold ml-auto mr-auto border-b border-gray-200 w-60 text-center pb-1">
-          Create a Business
-        </h2>
-        <div className="flex justify-between pl-3 pr-3">
-          <div className="flex flex-col mt-5">
-            <label htmlFor="name">
-              Business Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="email"
-              type="email"
-              className="bg-gray-100 w-50 rounded-sm pl-2 text-gray-900"
-              required
-            ></input>
-          </div>
-          <div className="flex flex-col mt-5">
-            <label htmlFor="name">
-              Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              name="name"
-              type="text"
-              className="bg-gray-100 w-50 rounded-sm pl-2 text-gray-900"
-              required
-            ></input>
-          </div>
+    <section className="ml-auto mr-auto mt-10 flex flex-col w-250 gap-y-6 pb-10">
+      <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-100">
+            Create a Business
+          </h2>
         </div>
-        <div className="flex justify-between pl-3 pr-3">
-          <div className="flex flex-col mt-5">
-            <label htmlFor="phone">Phone Number</label>
-            <div className="flex flex-col bg-gray-100 rounded-sm h-6 mb-0 w-50 pl-2 text-gray-900">
-              <PhoneInput
-                name="phone"
-                value={phone}
-                onChange={(e) => setPhone(e?.toString())}
-                defaultCountry={'GR'}
+
+        <form
+          onSubmit={(e) => handleSubmit(e)}
+          className="px-6 py-6 flex flex-col gap-y-6"
+        >
+          <div className="grid grid-cols-2 gap-x-6">
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                Name <span className="text-red-400">*</span>
+              </label>
+              <input
+                name="name"
+                type="text"
+                placeholder="Business name"
+                className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 placeholder-gray-500 transition-colors"
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                Business Email <span className="text-red-400">*</span>
+              </label>
+              <input
+                name="email"
+                type="email"
+                placeholder="Business email"
+                className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 placeholder-gray-500 transition-colors"
+                required
               />
             </div>
           </div>
-          <div className="flex flex-col mt-5">
-            <label htmlFor="is-active">
-              Availability <span className="text-red-500">*</span>
-            </label>
-            <select
-              name="is-active"
-              className="bg-gray-100 w-50 h-6 rounded-sm pl-2 text-gray-900 hover:cursor-pointer"
-              required
-            >
-              <option className="text-gray-900">Active</option>
-              <option className="text-gray-900">Inactive</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex flex-col mt-5 pl-3 pr-3">
-          <label htmlFor="description">Description</label>
-          <textarea
-            name="description"
-            className="bg-gray-100 w-full rounded-sm pl-2 text-gray-900 h-25 resize-none align-top"
-            maxLength={255}
-          ></textarea>
-        </div>
-        <div className="flex">
-          <div className="flex flex-col mt-5 pl-3 pr-3 w-fit gap-y-0.5">
-            <label htmlFor="address">Address</label>
-            <input
-              name="address"
-              type="text"
-              className="bg-gray-100 w-50 rounded-sm pl-2 text-gray-900"
-            ></input>
-            <label htmlFor="city">City</label>
-            <input
-              name="city"
-              type="text"
-              className="bg-gray-100 w-50 rounded-sm pl-2 text-gray-900"
-            ></input>
-            <label htmlFor="address">Country</label>
-            <input
-              name="country"
-              type="text"
-              className="bg-gray-100 w-50 rounded-sm pl-2 text-gray-900"
-            ></input>
+
+          <div className="grid grid-cols-2 gap-x-6">
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                Phone Number
+              </label>
+              <div className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm border border-gray-600 focus-within:border-blue-500 transition-colors">
+                <PhoneInput
+                  name="phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e?.toString())}
+                  defaultCountry="GR"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                Availability <span className="text-red-400">*</span>
+              </label>
+              <select
+                name="isActive"
+                className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 cursor-pointer transition-colors"
+                required
+              >
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
           </div>
 
-          <button className="w-1/3 h-1/2 bg-gray-600 ml-auto mr-12 mt-16 hover:bg-gray-500">
-            Create Business
-          </button>
-        </div>
-      </form>
+          <div className="flex flex-col gap-y-1.5">
+            <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+              Description
+            </label>
+            <textarea
+              name="description"
+              placeholder="What does your business do?"
+              className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 placeholder-gray-500 resize-none h-24 transition-colors"
+              maxLength={255}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-x-6">
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                Address
+              </label>
+              <input
+                name="address"
+                type="text"
+                placeholder="Street 123"
+                className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 placeholder-gray-500 transition-colors"
+              />
+            </div>
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                City
+              </label>
+              <input
+                name="city"
+                type="text"
+                placeholder="Athens"
+                className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 placeholder-gray-500 transition-colors"
+              />
+            </div>
+            <div className="flex flex-col gap-y-1.5">
+              <label className="text-xs uppercase tracking-wider text-gray-400 font-medium">
+                Country
+              </label>
+              <input
+                name="country"
+                type="text"
+                placeholder="Greece"
+                className="bg-gray-700 text-gray-100 rounded-md px-3 py-2 text-sm outline-none border border-gray-600 focus:border-blue-500 placeholder-gray-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-x-3 pt-2 border-t border-gray-700">
+            <button
+              type="button"
+              onClick={() => navigate('/business')}
+              className="px-4 py-2 text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-700 rounded-md transition-colors duration-150"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-150"
+            >
+              Create Business
+            </button>
+          </div>
+        </form>
+      </div>
     </section>
   );
 }
