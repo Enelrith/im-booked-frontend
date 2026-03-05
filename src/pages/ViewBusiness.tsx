@@ -127,8 +127,8 @@ export default function ViewBusiness() {
           {business.phone && <span>{business.phone}</span>}
           {(business.address || business.city || business.country) && (
             <span className="ml-auto flex gap-x-1">
-              {business.address && `${business.address},`}
-              {business.city && `${business.city},`}
+              {business.address && `${business.address}, `}
+              {business.city && `${business.city}, `}
               {business.country && `${business.country}`}
             </span>
           )}
