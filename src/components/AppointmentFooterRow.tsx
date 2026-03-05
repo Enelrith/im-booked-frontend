@@ -11,11 +11,12 @@ export default function AppointmentFooterRow({
   onAddAppointment: (appointment: AppointmentPost) => void;
 }) {
   const [isCreating, setIsCreating] = useState<boolean>(false);
+
   const [newAppointment, setNewAppointment] = useState<AppointmentPost>({
     clientName: '',
     appointmentStart: new Date().toLocaleString(),
     appointmentEnd: new Date().toLocaleString(),
-    serviceId: services[0].id,
+    serviceId: services[0]?.id || null,
   });
 
   return (
