@@ -12,7 +12,7 @@ export default function ServiceFooterRow({
   business,
   onAddService,
 }: ServiceFooterRowProps) {
-  const [isCreating, setIsCreating] = useState<boolean>(true);
+  const [isCreating, setIsCreating] = useState<boolean>(false);
   const [newService, setNewService] = useState<Service>({
     id: '',
     name: '',
