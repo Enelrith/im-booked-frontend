@@ -22,7 +22,7 @@ export default function AppointmentFooterRow({
     <tfoot>
       <tr className="border-t border-gray-700 text-center h-12">
         {!isCreating && (
-          <th scope="row" colSpan={6}>
+          <th scope="row" colSpan={7}>
             <button
               className="w-full hover:bg-gray-700/50 text-gray-400 hover:text-gray-100 transition-colors duration-150 h-12 flex items-center justify-center gap-x-2 text-sm"
               onClick={() => setIsCreating(true)}
@@ -48,7 +48,7 @@ export default function AppointmentFooterRow({
                 }
               />
             </th>
-            <td className="px-4 py-2">
+            <td className="px-4 py-2" colSpan={2}>
               <input
                 type="datetime-local"
                 className="bg-gray-600 text-gray-100 pl-2 rounded w-full outline-none border border-gray-500 focus:border-blue-500 text-sm"
@@ -60,7 +60,7 @@ export default function AppointmentFooterRow({
                 }
               />
             </td>
-            <td className="px-4 py-2">
+            <td className="px-4 py-2" colSpan={2}>
               <input
                 type="datetime-local"
                 className="bg-gray-600 text-gray-100 pl-2 rounded w-full outline-none border border-gray-500 focus:border-blue-500 text-sm"
@@ -72,7 +72,7 @@ export default function AppointmentFooterRow({
                 }
               />
             </td>
-            <td className="px-4 py-2" colSpan={2}>
+            <td className="px-4 py-2">
               <select
                 className="bg-gray-600 text-gray-100 rounded px-2 py-1 outline-none border border-gray-500 focus:border-blue-500 cursor-pointer text-sm w-full"
                 onChange={(e) =>

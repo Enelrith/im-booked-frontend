@@ -1,5 +1,5 @@
 import { AppointmentGet, AppointmentPost, Business, Service } from '../types';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCheck,
@@ -11,6 +11,7 @@ import {
   updateAppointment,
   deleteAppointment,
 } from '../services/BusinessAppointments';
+import AppointmentStatusMenu from './AppointmentStatusMenu';
 
 const statusStyles: Record<string, string> = {
   SCHEDULED: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
@@ -47,6 +48,7 @@ export default function AppointmentRow({
   onUpdate: (updated: AppointmentGet) => void;
 }) {
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [showStatusMenu, setShowStatusMenu] = useState<boolean>(false);
   const [updatedAppointment, setUpdatedAppointment] = useState<AppointmentPost>(
     {
       clientName: appointment.clientName,
@@ -55,6 +57,10 @@ export default function AppointmentRow({
       serviceId: null,
     }
   );
+  const [currentStatus, setCurrentStatus] = useState<string>(
+    appointment.status
+  );
+  const statusMenuRef = useRef<HTMLDivElement>(null);
 
   const handleSave = async () => {
     const response = await updateAppointment(
@@ -78,6 +84,21 @@ export default function AppointmentRow({
   const isAppointmentExpired = (appointment: AppointmentGet) => {
     return new Date() > new Date(appointment.appointmentEnd);
   };
+
+  useEffect(() => {
+    const menuListener = (e: MouseEvent) => {
+      if (
+        statusMenuRef.current &&
+        !statusMenuRef.current.contains(e.target as Node)
+      ) {
+        setShowStatusMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', menuListener);
+
+    return () => document.removeEventListener('mousedown', menuListener);
+  }, []);
 
   return (
     <tr className="border-b border-gray-700/50 hover:bg-gray-700/30 transition-colors duration-150">
@@ -157,20 +178,35 @@ export default function AppointmentRow({
       <td className="px-4 py-3 text-gray-300">
         {appointment.servicePrice ? `€${appointment.servicePrice}` : '—'}
       </td>
-      <td className="px-4 py-3 flex justify-between mt-2">
-        <span
-          className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[appointment.status] ?? ''}`}
+      <td className="px-4 py-3 flex justify-between mt-2 relative">
+        <button
+          className="w-fit h-fit"
+          onClick={() => setShowStatusMenu(!showStatusMenu)}
         >
-          {appointment.status}
-        </span>
-        {isAppointmentExpired(appointment) && (
           <span
-            className="text-yellow-400 font-semibold w-5 outline-1 outline-yellow-600 rounded-full text-center hover:cursor-pointer"
-            title="The end date of this appointment has passed!"
+            className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[currentStatus] ?? ''}`}
           >
-            !
+            {currentStatus}
           </span>
-        )}
+        </button>
+        <AppointmentStatusMenu
+          statusStyles={statusStyles}
+          menuOpacity={
+            showStatusMenu ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }
+          appointment={appointment}
+          setStatus={setCurrentStatus}
+          statusMenuRef={statusMenuRef}
+        />
+        {isAppointmentExpired(appointment) &&
+          appointment.status === 'SCHEDULED' && (
+            <span
+              className="text-yellow-400 font-semibold w-5 h-5.5 outline-1 mt-2 outline-yellow-600 rounded-full text-center hover:cursor-pointer"
+              title="The end date of this appointment has passed!"
+            >
+              !
+            </span>
+          )}
       </td>
       <td className="px-4 py-3 w-20">
         {!isUpdating ? (
