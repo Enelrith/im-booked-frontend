@@ -17,12 +17,11 @@ import ViewBusiness from './pages/ViewBusiness';
 
 const Layout = () => {
   const location = useLocation();
-  const hideNavbar = ['/login', '/register'].includes(location.pathname);
   const showSidebar = location.pathname.startsWith('/business');
 
   return (
     <div className="flex flex-col">
-      {!hideNavbar && <Navbar />}
+      <Navbar />
       <div className="flex flex-1">
         {showSidebar && <BusinessSidebar />}
         <main className="flex flex-1">
