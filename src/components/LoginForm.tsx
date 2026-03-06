@@ -17,6 +17,12 @@ export default function LoginForm() {
     if (!response) return;
     if (response.status == 200) {
       setAuthHeader(response.data.accessToken);
+
+      const tokenPayload = JSON.parse(
+        atob(response.data.accessToken.split('.')[1])
+      );
+      localStorage.setItem('email', tokenPayload.sub);
+
       navigate('/');
     } else {
       setErrors(response.data);
