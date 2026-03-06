@@ -14,6 +14,7 @@ import BusinessDashboard from './pages/BusinessDashboard';
 import BusinessSidebar from './components/BusinessSidebar';
 import CreateBusiness from './pages/CreateBusiness';
 import ViewBusiness from './pages/ViewBusiness';
+import Unauthorized from './pages/Unauthorized';
 
 const Layout = () => {
   const location = useLocation();
@@ -43,6 +44,7 @@ function App() {
           <Route path="/business" element={<BusinessDashboard />} />
           <Route path="/business/create" element={<CreateBusiness />} />
           <Route path="/business/:id" element={<ViewBusiness />} />
+          <Route path="/unauthorized" element={<Unauthorized />} />
         </Route>
       </Routes>
     </BrowserRouter>

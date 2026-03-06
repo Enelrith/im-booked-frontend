@@ -16,15 +16,19 @@ export const setAuthHeader = (token: string) => {
 axiosAuth.interceptors.response.use(undefined, async (error) => {
   if (error.status === 401) {
     try {
-      const response = await axios.post(`${getBackendUrl()}/api/auth/refresh`, {
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${getBackendUrl()}/api/auth/refresh`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
       if (response.status === 200) setAuthHeader(response.data.accessToken);
 
       return axiosAuth(error.config);
     } catch (error) {
       if (isAxiosError(error)) {
-        window.location.href = `${getFrontendUrl()}/login`;
+        window.location.href = `${getFrontendUrl()}/unauthorized`;
       }
     }
   }
