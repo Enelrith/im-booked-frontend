@@ -13,9 +13,11 @@ export const setAuthHeader = (token: string) => {
   }
 };
 
+let isRefreshing: boolean = false;
 axiosAuth.interceptors.response.use(undefined, async (error) => {
-  if (error.status === 401) {
+  if (error.status === 401 && !isRefreshing) {
     try {
+      isRefreshing = true;
       const response = await axios.post(
         `${getBackendUrl()}/api/auth/refresh`,
         {},
@@ -30,6 +32,8 @@ axiosAuth.interceptors.response.use(undefined, async (error) => {
       if (isAxiosError(error)) {
         window.location.href = `${getFrontendUrl()}/unauthorized`;
       }
+    } finally {
+      isRefreshing = false;
     }
   }
   return Promise.reject(error);

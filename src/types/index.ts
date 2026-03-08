@@ -58,3 +58,17 @@ export interface AppointmentGet {
   servicePrice: number;
   serviceDurationMinutes: number;
 }
+
+export interface IBusinessReport {
+  totalAppointments: number;
+  completedAppointments: number;
+  cancelledAppointments: number;
+  scheduledAppointments: number;
+  totalRevenue: number;
+  monthlyAppointments: number;
+  monthlyCompletedAppointments: number;
+  monthlyCancelledAppointments: number;
+  monthlyScheduledAppointments: number;
+  monthlyRevenue: number;
+  monthName: string;
+}

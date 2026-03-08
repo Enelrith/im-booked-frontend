@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
   AppointmentGet,
@@ -117,9 +117,12 @@ export default function ViewBusiness() {
       )}
 
       <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <h2 className="text-2xl font-semibold text-gray-100">
-          {business.name as string}
-        </h2>
+        <div className="flex justify-between">
+          <h2 className="text-2xl font-semibold text-gray-100">
+            {business.name as string}
+          </h2>
+          <Link to={`/reports/${business.id}`}>Business Report &rarr;</Link>
+        </div>
         {business.description && (
           <p className="mt-2 text-gray-400">{business.description as string}</p>
         )}

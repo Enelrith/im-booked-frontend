@@ -15,10 +15,14 @@ import BusinessSidebar from './components/BusinessSidebar';
 import CreateBusiness from './pages/CreateBusiness';
 import ViewBusiness from './pages/ViewBusiness';
 import Unauthorized from './pages/Unauthorized';
+import ViewReport from './pages/ViewReport';
 
 const Layout = () => {
   const location = useLocation();
-  const showSidebar = location.pathname.startsWith('/business');
+
+  const showSidebar =
+    location.pathname.startsWith('/business') ||
+    location.pathname.startsWith('/reports');
 
   return (
     <div className="flex flex-col">
@@ -44,6 +48,7 @@ function App() {
           <Route path="/business" element={<BusinessDashboard />} />
           <Route path="/business/create" element={<CreateBusiness />} />
           <Route path="/business/:id" element={<ViewBusiness />} />
+          <Route path="/reports/:id" element={<ViewReport />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
         </Route>
       </Routes>

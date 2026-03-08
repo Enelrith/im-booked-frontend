@@ -7,11 +7,18 @@ export default function BusinessSidebar() {
         <h2 className="mt-2 font-semibold text-lg border-b border-gray-500 w-50 ml-auto mr-auto text-center">
           Business Dashboard
         </h2>
-        <ul className="pl-5 mt-3">
+        <ul className="pl-5 mt-3 flex flex-col gap-y-3">
           <li>
             <Link to={'/business/create'}>
               <span className="text-gray-100 font-semibold hover:text-gray-300">
                 Create Business
+              </span>
+            </Link>
+          </li>
+          <li>
+            <Link to={'/business'}>
+              <span className="text-gray-100 font-semibold hover:text-gray-300">
+                Manage Businesses
               </span>
             </Link>
           </li>
